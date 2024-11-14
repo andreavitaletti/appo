@@ -1,4 +1,4 @@
-time, bus(V), shunt (mV), load (V), current (mA), power (mW)
+time, bus(V), shunt(mV), load(V), current(mA), power(mW)
 1.560424 3.30,0.27,3.30,2.90,10.00
 1.614002 3.30,0.30,3.30,2.50,10.00
 1.671112 3.30,0.28,3.30,2.30,6.00

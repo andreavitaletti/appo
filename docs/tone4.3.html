@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+    <script src="https://unpkg.com/tone"></script>
+</head>
+<body>
+    <div>
+        <label for="folderSelect">Seleziona una cartella:</label>
+        <select id="folderSelect">
+            <option value="guarda_che_luna">Guarda_che_luna</option>
+            <option value="e_io_ci_sto">E io ci sto</option>
+            <option value="rosalina">Rosalina</option>
+        </select>
+    </div>
+    <div>
+    Puoi riprodurre le tracce solo quando il tasto play diventa verde <br>
+
+    <button id="button_start" style="background-color: red;">Play</button>
+    <button id="button_stop">Stop</button>
+    </div>
+    <div id="my_log">
+
+    </div>
+    
+   
+    
+    <div>
+        <label>Master Volume:</label>
+        <input type="range" min="-60" max="0" value="-20" class="slider" id="masterVolume">
+    </div>
+    
+    <div id="channelControls">
+        <!-- I controlli per le tracce saranno generati dinamicamente -->
+    </div>
+
+    <script type="text/javascript">
+        let players = {}; // Per memorizzare i player
+        let channels = {}; // Per memorizzare i canali
+        let allLoaded = false; // To track if all players are loaded
+
+        const channelNames = ["drum", "bass", "all"]; 
+
+        function makeChannel(name, url, pan, onPlayerLoad) {
+            const channel = new Tone.Channel({ pan, volume: -20 }).toDestination();
+            const player = new Tone.Player({
+                url: `http://localhost:8000/${url}.mp3`,
+                onload: onPlayerLoad,
+            }).sync().start(0);
+            player.connect(channel);
+
+            players[name] = player;
+            channels[name] = channel;
+        }
+
+        async function checkFileExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        async function loadTracks(folder) {
+            Tone.Transport.stop();
+            Object.values(players).forEach(player => player.dispose());
+            players = {};
+            channels = {};
+            allLoaded = false;
+            document.getElementById("button_start").style.background = "rgba(255,0,0,0.8)";
+
+            const channelControls = document.getElementById("channelControls");
+            channelControls.innerHTML = "";
+
+            let loadCount = 0;
+            let availableTracks = 0;
+
+            for (const [index, name] of channelNames.entries()) {
+                const url = `http://localhost:8000/${folder}/${name}.mp3`;
+                const exists = await checkFileExists(url);
+                if (!exists) {
+                    console.warn(`File not found: ${url}`);
+                    continue;
+                }
+
+                availableTracks++;
+                const pan = index === 0 ? 0 : index === 1 ? -0.5 : 0.5;
+                makeChannel(name, `${folder}/${name}`, pan, () => {
+                    loadCount++;
+                    if (loadCount === availableTracks) {
+                        allLoaded = true;
+                        document.getElementById("button_start").style.background = "rgba(0,255,0,0.8)";
+                        console.log("All available tracks loaded");
+                    }
+                });
+
+                const trackControl = document.createElement("div");
+                trackControl.innerHTML = `
+                    <label>${name.charAt(0).toUpperCase() + name.slice(1)} Volume:</label>
+                    <input type="range" min="-60" max="0" value="-20" class="slider" id="${name}Volume">
+                `;
+                channelControls.appendChild(trackControl);
+
+                document.getElementById(`${name}Volume`).oninput = function () {
+                    channels[name].volume.value = parseFloat(this.value);
+                };
+            }
+
+            if (availableTracks === 0) {
+                document.getElementById("my_log").innerHTML = "No tracks available in the selected folder.";
+            }
+        }
+
+        const masterVolume = document.getElementById("masterVolume");
+        masterVolume.oninput = function () {
+            Tone.Destination.volume.value = parseFloat(this.value);
+        };
+
+        const folderSelect = document.getElementById("folderSelect");
+        folderSelect.onchange = function () {
+            const folder = this.value;
+            loadTracks(folder);
+        };
+
+        document.getElementById("button_start").addEventListener("click", () => {
+            if (allLoaded) {
+                Tone.Transport.start();
+                console.log("Transport started");
+            } else {
+                document.getElementById("button_start").style.background = "rgba(255,0,0,0.8)";
+                console.log("Tracks are not fully loaded yet.");
+                document.getElementById("my_log").innerHTML="Tracks are not fully loaded yet.";
+            }
+        });
+
+        document.getElementById("button_stop").addEventListener("click", () => {
+            Tone.Transport.stop();
+            console.log("Transport stopped");
+        });
+
+        loadTracks(folderSelect.value);
+    </script>
+</body>
+</html>

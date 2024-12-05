@@ -2,43 +2,59 @@
 <html>
 <head>
     <script src="https://unpkg.com/tone"></script>
+    <!--
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+    --> 
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css"
+    />
 </head>
 <body>
+    <main class="container">
     <div>
-        <label for="folderSelect">Seleziona una cartella:</label>
+        <div>
+            Seleziona la canzone:
+        </div>
+        <div>
         <select id="folderSelect">
-            <option value="guarda_che_luna">Guarda_che_luna</option>
+            <option value="guarda_che_luna">Guarda che luna</option>
             <option value="e_io_ci_sto">E io ci sto</option>
-            <option value="rosalina">Rosalina</option>
+            <option value="rosalina1">Rosalina</option>
         </select>
+        </div>
     </div>
     <div>
-    Puoi riprodurre le tracce solo quando il tasto play diventa verde <br>
-
-    <button id="button_start" style="background-color: red;">Play</button>
-    <button id="button_stop">Stop</button>
+        <span>Puoi riprodurre le tracce solo quando il tasto play diventa verde</span>
     </div>
-    <div id="my_log">
+
+    <div>     
+    <button id="button_start" style="background-color: red; color:black;">Play</button>
+    <button id="button_stop" style="background-color: red; color:black;">Stop</button>
+    </div>
+
+    <!--
+    <div id="my_log" class="flex two four-800">
 
     </div>
-    
+    -->
    
     
     <div>
         <label>Master Volume:</label>
-        <input type="range" min="-60" max="0" value="-20" class="slider" id="masterVolume">
+        <input type="range" min="-60" max="0" value="0" class="slider" id="masterVolume">
     </div>
-    
     <div id="channelControls">
         <!-- I controlli per le tracce saranno generati dinamicamente -->
     </div>
-
+    </div>
+</main>
     <script type="text/javascript">
         let players = {}; // Per memorizzare i player
         let channels = {}; // Per memorizzare i canali
         let allLoaded = false; // To track if all players are loaded
 
-        const channelNames = ["drum", "bass", "all"]; 
+        const channelNames = ["drum", "bass", "all", "music", "vocals"]; 
 
         function makeChannel(name, url, pan, onPlayerLoad) {
             const channel = new Tone.Channel({ pan, volume: -20 }).toDestination();
@@ -95,9 +111,10 @@
                 });
 
                 const trackControl = document.createElement("div");
+                //trackControl.className = "flex two four-800";
                 trackControl.innerHTML = `
                     <label>${name.charAt(0).toUpperCase() + name.slice(1)} Volume:</label>
-                    <input type="range" min="-60" max="0" value="-20" class="slider" id="${name}Volume">
+                    <input type="range" min="-60" max="0" value="0" class="slider" id="${name}Volume">
                 `;
                 channelControls.appendChild(trackControl);
 
@@ -129,7 +146,7 @@
             } else {
                 document.getElementById("button_start").style.background = "rgba(255,0,0,0.8)";
                 console.log("Tracks are not fully loaded yet.");
-                document.getElementById("my_log").innerHTML="Tracks are not fully loaded yet.";
+                //document.getElementById("my_log").innerHTML="Tracks are not fully loaded yet.";
             }
         });
 

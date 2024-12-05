@@ -76,7 +76,7 @@
             let availableTracks = 0;
 
             for (const [index, name] of channelNames.entries()) {
-                const url = `/${folder}/${name}.mp3`;
+                const url = `${folder}/${name}.mp3`;
                 const exists = await checkFileExists(url);
                 if (!exists) {
                     console.warn(`File not found: ${url}`);

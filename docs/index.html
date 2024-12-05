@@ -43,7 +43,7 @@
         function makeChannel(name, url, pan, onPlayerLoad) {
             const channel = new Tone.Channel({ pan, volume: -20 }).toDestination();
             const player = new Tone.Player({
-                url: `http://localhost:8000/${url}.mp3`,
+                url: `${url}.mp3`,
                 onload: onPlayerLoad,
             }).sync().start(0);
             player.connect(channel);
@@ -76,7 +76,7 @@
             let availableTracks = 0;
 
             for (const [index, name] of channelNames.entries()) {
-                const url = `http://localhost:8000/${folder}/${name}.mp3`;
+                const url = `/${folder}/${name}.mp3`;
                 const exists = await checkFileExists(url);
                 if (!exists) {
                     console.warn(`File not found: ${url}`);

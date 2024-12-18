@@ -9,9 +9,25 @@
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css"
     />
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+    <style>
+	@font-face {
+    font-family: "myFirstFont";
+    src: url("Momstypewriter-zrBX.ttf");
+}
+
+.harlow {
+    font-family: "myFirstFont";
+}
+</style>
+        
+                        
 </head>
 <body>
     <main class="container">
+    <div id="app" class="harlow">
+    
+    </div>
     <div>
         <div>
             Seleziona la canzone:
@@ -44,13 +60,40 @@
     
     <div>
         <label>Master Volume:</label>
-        <input type="range" min="-60" max="0" value="0" class="slider" id="masterVolume">
+        <input type="range" min="-60" max="10" value="0" class="slider" id="masterVolume">
     </div>
     <div id="channelControls">
         <!-- I controlli per le tracce saranno generati dinamicamente -->
     </div>
     </div>
 </main>
+
+<script type="text/javascript">
+
+var app = document.getElementById('app');
+
+var typewriter = new Typewriter(app, {
+  loop: true,
+  delay: 75,
+});
+
+typewriter
+  .pauseFor(2500)
+  .typeString('Caro Rino')
+  .pauseFor(2000)
+  .deleteAll()
+  .typeString('Carissimo Rino')
+  .pauseFor(2000)
+  .deleteAll()
+  .typeString('Rino <br>')
+  .pauseFor(1000)
+  .typeString('siamo un gruppo di ...')
+  .start();
+
+</script>
+
+
+
     <script type="text/javascript">
         let players = {}; // Per memorizzare i player
         let channels = {}; // Per memorizzare i canali
@@ -59,7 +102,7 @@
         const channelNames = ["drum", "bass", "all", "music", "vocals"]; 
 
         function makeChannel(name, url, pan, onPlayerLoad) {
-            const channel = new Tone.Channel({ pan, volume: -20 }).toDestination();
+            const channel = new Tone.Channel({ pan, volume: 0 }).toDestination();
             const player = new Tone.Player({
                 url: `${url}.mp3`,
                 onload: onPlayerLoad,
@@ -99,7 +142,7 @@
                 if (!exists) {
                     console.warn(`File not found: ${url}`);
                     continue;
-                }
+                } else { console.log(`${folder}/${name}.mp3 loaded`); }
 
                 availableTracks++;
                 const pan = index === 0 ? 0 : index === 1 ? -0.5 : 0.5;
@@ -116,7 +159,7 @@
                 //trackControl.className = "flex two four-800";
                 trackControl.innerHTML = `
                     <label>${name.charAt(0).toUpperCase() + name.slice(1)} Volume:</label>
-                    <input type="range" min="-60" max="0" value="0" class="slider" id="${name}Volume">
+                    <input type="range" min="-60" max="10" value="0" class="slider" id="${name}Volume">
                 `;
                 channelControls.appendChild(trackControl);
 
